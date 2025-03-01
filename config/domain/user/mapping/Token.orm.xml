@@ -1,0 +1,17 @@
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                   https://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
+    <entity name="App\DDD\User\Domain\Entity\Token" table="tokens">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="CUSTOM"/>
+            <custom-id-generator class="Ramsey\Uuid\Doctrine\UuidGenerator"/>
+        </id>
+        <many-to-one field="user" target-entity="App\DDD\User\Domain\Entity\User" inversed-by="tokens">
+            <cascade>
+                <cascade-persist />
+            </cascade>
+        </many-to-one>
+        <field name="token" unique="true" />
+    </entity>
+</doctrine-mapping>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<constraint-mapping xmlns="http://symfony.com/schema/dic/constraint-mapping"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping
+        https://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
+
+    <class name="App\DDD\User\Domain\Command\UserRegistrationCommand">
+        <constraint name="App\DDD\Shared\Infrastructure\Constraint\UniqueField">
+            <value key="entityClass">App\DDD\User\Domain\Entity\User</value>
+            <value key="entityField">email</value>
+            <value key="formValuePath">email</value>
+            <value key="fieldName">email</value>
+        </constraint>
+        <property name="email">
+            <constraint name="NotBlank"/>
+            <constraint name="Email"/>
+        </property>
+        <property name="password">
+            <constraint name="NotBlank"/>
+            <constraint name="Length">
+                <value key="min">6</value>
+            </constraint>
+        </property>
+    </class>
+</constraint-mapping>

@@ -1,0 +1,13 @@
+services:
+  App\DDD\User\Domain\Command\Handler\UserRegistrationHandler:
+    tags: [ messenger.message_handler ]
+    arguments:
+      - '@App\DDD\User\Domain\Service\AuthServiceInterface'
+      - '@App\DDD\User\Domain\Factory\UserFactory'
+      - '@App\DDD\User\Domain\Repository\UserRepositoryInterface'
+
+  App\DDD\User\Domain\Command\Handler\UserLoginHandler:
+    tags: [ messenger.message_handler ]
+    arguments:
+      - '@App\DDD\User\Domain\Service\AuthServiceInterface'
+      - '@App\DDD\User\Domain\Repository\UserRepositoryInterface'
