@@ -4,7 +4,7 @@ import PrimeVue from "primevue/config";
 import ToastService from "primevue/toastservice";
 
 // Import PrimeVue theme preset
-import Aura from '@primeuix/themes/aura';
+import Aura from '@primevue/themes/aura';
 
 // Import Inter font used in PrimeVue 3
 import "./assets/fonts/inter.css";

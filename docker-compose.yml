@@ -6,9 +6,12 @@ services:
     build:
       context: ./docker/php
     volumes:
+      - ./docker/php/docker-entrypoint.sh:/docker-entrypoint.sh
       - ./symfony:/var/www/symfony
     depends_on:
       - mysql
+    entrypoint: [ "/bin/sh", "/docker-entrypoint.sh" ]
+    command: php-fpm
     networks:
       - app-network
 
@@ -47,15 +50,14 @@ services:
       context: ./docker/node
     ports:
       - "8080:8080"
-    # Don't mount the entire directory, just specific paths we want to persist
     volumes:
-      - ./vue/src:/app/src
-      - ./vue/public:/app/public
+      - ./vue:/app
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
     networks:
       - app-network
+    command: sh -c "cd /app && npm install && npm run dev"
     restart: unless-stopped
 
 networks:

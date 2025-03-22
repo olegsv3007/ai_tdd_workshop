@@ -22,11 +22,5 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/symfony
 
-# Copy entrypoint script
-COPY entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
 # Expose port 9000 for PHP-FPM
 EXPOSE 9000
-
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
