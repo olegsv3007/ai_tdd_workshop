@@ -17,103 +17,122 @@
       </div>
       <div v-else-if="isCreating || isEditing">
         <!-- Create/Edit Mode -->
-        <div class="task-edit-mode">
+        <div class="task-edit-mode p-1">
           <div class="p-fluid">
-            <div class="grid mb-4">
-              <div class="col-12 md:col-6">
-                <div class="field mb-3">
-                  <label for="title" class="block mb-1">Title</label>
-                  <InputText 
-                    id="title" 
-                    v-model="editedTask.title" 
-                    :class="{'p-invalid': titleError}"
-                    aria-describedby="title-error"
-                  />
-                  <small id="title-error" class="p-error block" v-if="titleError">
-                    Title is required
-                  </small>
+            <div class="form-header mb-2 pb-1 border-bottom-1 border-300">
+              <h2 class="text-lg font-medium m-0 p-0">{{ isCreating ? 'Create New Task' : 'Edit Task' }}</h2>
+            </div>
+
+            <!-- Status indicators bar - Simple dropdowns like in screenshot -->
+            <div class="flex flex-wrap mb-2 gap-1">
+              <Dropdown
+                v-model="editedTask.type"
+                :options="taskTypes"
+                placeholder="Type"
+                class="w-10rem mr-1"
+              />
+              
+              <Dropdown
+                v-model="editedTask.priority"
+                :options="taskPriorities"
+                placeholder="Priority"
+                class="w-10rem mr-1"
+              />
+              
+              <Dropdown
+                v-model="editedTask.status"
+                :options="taskStatuses"
+                placeholder="Status"
+                class="w-10rem"
+              />
+            </div>
+            
+            <!-- Title field - simple with no background -->
+            <div class="mb-2">
+              <InputText 
+                id="title" 
+                v-model="editedTask.title" 
+                placeholder="Enter task title"
+                :class="['w-full text-xl', {'p-invalid': titleError}]"
+                aria-describedby="title-error"
+              />
+              <small id="title-error" class="p-error block mt-1" v-if="titleError">
+                <i class="pi pi-exclamation-circle mr-1"></i>Title is required
+              </small>
+            </div>
+
+            <!-- Assignee box -->
+            <div class="mb-3">
+              <div class="p-1 surface-50 border-round mb-2">
+                <div class="flex align-items-center mb-1">
+                  <i class="pi pi-user text-blue-600 mr-1"></i>
+                  <span class="font-medium">Assignee</span>
                 </div>
-                
-                <div class="grid">
-                  <div class="col-6 field mb-3">
-                    <label for="type" class="block mb-1">Type</label>
-                    <Dropdown
-                      id="type"
-                      v-model="editedTask.type"
-                      :options="taskTypes"
-                      optionLabel=""
-                      placeholder="Select Type"
-                      class="w-full"
-                    />
-                  </div>
-                  
-                  <div class="col-6 field mb-3">
-                    <label for="priority" class="block mb-1">Priority</label>
-                    <Dropdown
-                      id="priority"
-                      v-model="editedTask.priority"
-                      :options="taskPriorities"
-                      optionLabel=""
-                      placeholder="Select Priority"
-                      class="w-full"
-                    />
-                  </div>
-                </div>
-                
-                <div class="grid">
-                  <div class="col-6 field mb-3">
-                    <label for="status" class="block mb-1">Status</label>
-                    <Dropdown
-                      id="status"
-                      v-model="editedTask.status"
-                      :options="taskStatuses"
-                      optionLabel=""
-                      placeholder="Select Status"
-                      class="w-full"
-                    />
-                  </div>
-                  
-                  <div class="col-6 field mb-3">
-                    <label for="estimatedHours" class="block mb-1">Estimated Hours</label>
-                    <InputNumber
-                      id="estimatedHours"
-                      v-model="editedTask.estimatedHours"
-                      :min="0"
-                      :max="1000"
-                      showButtons
-                      class="w-full"
-                    />
-                  </div>
-                </div>
-                
-                <div class="field mb-3">
-                  <label for="assignee" class="block mb-1">Assignee</label>
-                  <InputText id="assignee" v-model="editedTask.assignee" class="w-full" />
-                </div>
+                <InputText 
+                  v-model="editedTask.assignee" 
+                  placeholder="Enter assignee name" 
+                  class="w-full" 
+                />
               </div>
               
-              <div class="col-12 md:col-6">
-                <div class="field mb-3">
-                  <label for="description" class="block mb-1">Description</label>
-                  <Textarea
-                    id="description"
-                    v-model="editedTask.description"
-                    rows="5"
-                    class="w-full"
-                    autoResize
-                  />
+              <!-- Reporter box -->
+              <div class="p-1 surface-50 border-round mb-2">
+                <div class="flex align-items-center mb-1">
+                  <i class="pi pi-user-edit text-green-600 mr-1"></i>
+                  <span class="font-medium">Reporter</span>
                 </div>
-                
-                <div class="field mb-3">
-                  <label for="tags" class="block mb-1">Tags (comma separated)</label>
-                  <Chips
-                    id="tags"
-                    v-model="editedTask.tags"
-                    separator=","
-                    placeholder="Add tag and press enter"
-                    class="w-full"
-                  />
+                <InputText 
+                  v-model="editedTask.reporter" 
+                  placeholder="Enter reporter name" 
+                  class="w-full" 
+                />
+              </div>
+              
+              <!-- Estimated Hours box -->
+              <div class="p-1 surface-50 border-round mb-2">
+                <div class="flex align-items-center mb-1">
+                  <i class="pi pi-clock text-purple-600 mr-1"></i>
+                  <span class="font-medium">Estimated Hours</span>
                 </div>
+                <InputNumber
+                  v-model="editedTask.estimatedHours"
+                  :min="0"
+                  placeholder="Hours"
+                  class="w-full"
+                  :showButtons="false"
+                />
+              </div>
+              
+              <!-- Description box -->
+              <div class="p-1 surface-50 border-round mb-2">
+                <div class="flex align-items-center mb-1">
+                  <i class="pi pi-file-edit text-blue-600 mr-1"></i>
+                  <span class="font-medium">Description</span>
+                </div>
+                <Textarea
+                  v-model="editedTask.description"
+                  rows="4"
+                  class="w-full text-md"
+                  placeholder="Enter task description"
+                  autoResize
+                />
+              </div>
+              
+              <!-- Tags box -->
+              <div class="p-1 surface-50 border-round">
+                <div class="flex align-items-center mb-1">
+                  <i class="pi pi-tags text-orange-600 mr-1"></i>
+                  <span class="font-medium">Tags</span>
+                </div>
+                <Chips
+                  v-model="editedTask.tags"
+                  separator=","
+                  placeholder="Add tag and press enter"
+                  class="w-full"
+                />
+                <small class="block mt-2 text-color-secondary">
+                  <i class="pi pi-info-circle mr-1"></i>Type a tag and press Enter or comma to add
+                </small>
               </div>
             </div>
           </div>
@@ -121,76 +140,98 @@
       </div>
       <div v-else-if="task">
         <!-- View Mode -->
-        <!-- View Mode -->
-        <div class="task-view-mode">
+        <div class="task-view-mode p-1">
+          <div class="view-header mb-2 pb-1 border-bottom-1 border-300">
+            <h2 class="text-lg font-medium m-0 p-0">Task Details</h2>
+          </div>
+          
+          <div class="task-metadata flex align-items-center gap-1 mb-2">
+            <Tag :value="task.type" :severity="getTypeSeverity(task.type)" class="font-medium" />
+            <Tag :value="task.priority" :severity="getPrioritySeverity(task.priority)" 
+              :class="{'high-priority-tag': task.priority === 'High'}" class="font-medium" />
+            <Tag :value="task.status" severity="info" class="font-medium" />
+          </div>
+          
+          <h2 class="task-title text-xl font-bold mb-4 p-2 surface-100 border-round">{{ task.title }}</h2>
+          
           <div class="grid mb-4">
             <div class="col-12 md:col-6">
-              <div class="task-metadata flex align-items-center gap-2 mb-3">
-                <Tag :value="task.type" :severity="getTypeSeverity(task.type)" />
-                <Tag :value="task.priority" :severity="getPrioritySeverity(task.priority)" />
-                <Tag :value="task.status" severity="info" />
-              </div>
-              
-              <h2 class="task-title text-xl font-bold mb-2">{{ task.title }}</h2>
-              
-              <div class="task-creators grid mb-3">
-                <div class="col-6">
-                  <div class="flex align-items-center">
-                    <Avatar icon="pi pi-user" size="small" class="mr-2" />
+              <div class="task-creators grid">
+                <div class="col-12 mb-3">
+                  <div class="flex align-items-center p-1 surface-50 border-round">
+                    <Avatar icon="pi pi-user" style="background-color:var(--p-blue-100);color:var(--p-blue-700)" size="large" class="mr-2" />
                     <div>
-                      <div class="text-xs text-color-secondary">Assignee</div>
-                      <div>{{ task.assignee || 'Unassigned' }}</div>
+                      <div class="text-md font-medium">Assignee</div>
+                      <div class="text-lg text-600">{{ task.assignee || 'Unassigned' }}</div>
                     </div>
                   </div>
                 </div>
-                <div class="col-6">
-                  <div class="flex align-items-center">
-                    <Avatar icon="pi pi-user-edit" size="small" class="mr-2" />
+                
+                <div class="col-12">
+                  <div class="flex align-items-center p-1 surface-50 border-round">
+                    <Avatar icon="pi pi-user-edit" style="background-color:var(--p-green-100);color:var(--p-green-700)" size="large" class="mr-2" />
                     <div>
-                      <div class="text-xs text-color-secondary">Reporter</div>
-                      <div>{{ task.reporter }}</div>
+                      <div class="text-md font-medium">Reporter</div>
+                      <div class="text-lg text-600">{{ task.reporter }}</div>
                     </div>
                   </div>
                 </div>
               </div>
-              
-              <div class="task-dates grid mb-3">
-                <div class="col-6">
-                  <div class="text-xs text-color-secondary">Created</div>
-                  <div>{{ formatDate(task.createdAt) }}</div>
-                </div>
-                <div class="col-6">
-                  <div class="text-xs text-color-secondary">Updated</div>
-                  <div>{{ formatDate(task.updatedAt) }}</div>
-                </div>
-              </div>
-              
-              <div class="text-xs text-color-secondary mb-1">Estimated Hours</div>
-              <div class="mb-4">{{ task.estimatedHours ? `${task.estimatedHours}h` : 'No estimate' }}</div>
             </div>
             
             <div class="col-12 md:col-6">
-              <div class="text-xs text-color-secondary mb-1">Description</div>
-              <p class="task-description mb-4 p-2 border-1 border-round surface-ground" style="min-height: 150px">
-                {{ task.description }}
-              </p>
-              
-              <div v-if="task.tags && task.tags.length > 0" class="task-tags mt-3">
-                <div class="text-xs text-color-secondary mb-1">Tags</div>
-                <div class="flex flex-wrap gap-1">
-                  <Tag
-                    v-for="tag in task.tags"
-                    :key="tag"
-                    :value="tag"
-                    severity="secondary"
-                  />
+              <div class="task-dates grid">
+                <div class="col-12 mb-3">
+                  <div class="flex align-items-center p-1 surface-50 border-round">
+                    <Avatar icon="pi pi-calendar-plus" style="background-color:var(--p-orange-100);color:var(--p-orange-700)" size="large" class="mr-2" />
+                    <div>
+                      <div class="text-md font-medium">Created</div>
+                      <div class="text-lg text-600">{{ formatDate(task.createdAt) }}</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="col-12">
+                  <div class="flex align-items-center p-1 surface-50 border-round">
+                    <Avatar icon="pi pi-calendar" style="background-color:var(--p-purple-100);color:var(--p-purple-700)" size="large" class="mr-2" />
+                    <div>
+                      <div class="text-md font-medium">Updated</div>
+                      <div class="text-lg text-600">{{ formatDate(task.updatedAt) }}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+          
+          <div class="task-description mb-2 p-2 surface-50 border-round">
+            <div class="text-lg font-medium mb-2 flex align-items-center">
+              <i class="pi pi-file-edit mr-2" style="color:var(--p-blue-600)"></i> Description
+            </div>
+            <p class="text-md line-height-3 whitespace-pre-line p-2">{{ task.description || 'No description provided for this task.' }}</p>
+          </div>
+          
+          <div class="task-estimated-hours mb-2 p-2 surface-50 border-round">
+            <div class="text-lg font-medium mb-2 flex align-items-center">
+              <i class="pi pi-stopwatch mr-2" style="color:var(--p-orange-600)"></i> Estimated Hours
+            </div>
+            <p class="text-lg text-600 p-2">{{ task.estimatedHours ? `${task.estimatedHours}h` : 'No estimate provided' }}</p>
+          </div>
+          
+          <div v-if="task.tags && task.tags.length > 0" class="task-tags mb-2 p-2 surface-50 border-round">
+            <div class="text-lg font-medium mb-2 flex align-items-center">
+              <i class="pi pi-tags mr-2" style="color:var(--p-green-600)"></i> Tags
+            </div>
+            <div class="flex flex-wrap gap-2 p-2">
+              <Tag
+                v-for="tag in task.tags"
+                :key="tag"
+                :value="tag"
+                severity="secondary"
+              />
+            </div>
+          </div>
         </div>
-        
-
       </div>
     </div>
     
@@ -498,11 +539,17 @@ const getPrioritySeverity = (priority: TaskPriority): string => {
 
 <style scoped>
 .task-detail {
-  max-height: 70vh;
+  max-height: 80vh;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .task-description {
   white-space: pre-line;
+}
+
+.task-description p {
+  font-size: 1.1rem;
+  color: var(--text-color);
 }
 </style>
