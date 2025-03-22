@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # PHP service
+  php:
+    build:
+      context: ./docker/php
+    volumes:
+      - ./symfony:/var/www/symfony
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+
+  # Nginx service
+  nginx:
+    build:
+      context: ./docker/nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./symfony:/var/www/symfony
+    depends_on:
+      - php
+    networks:
+      - app-network
+
+  # MySQL service
+  mysql:
+    build:
+      context: ./docker/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: symfony
+      MYSQL_USER: symfony
+      MYSQL_PASSWORD: symfony
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  # Node.js service for Vue.js frontend
+  node:
+    build:
+      context: ./docker/node
+    ports:
+      - "8080:8080"
+    # Don't mount the entire directory, just specific paths we want to persist
+    volumes:
+      - ./vue/src:/app/src
+      - ./vue/public:/app/public
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
