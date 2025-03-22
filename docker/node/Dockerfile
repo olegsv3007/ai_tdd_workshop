@@ -5,17 +5,18 @@ WORKDIR /app
 # Install Vue CLI globally
 RUN npm install -g @vue/cli
 
-# Install basic dependencies for Vue.js with Vite
+# Copy package.json and install dependencies
 COPY ./package.json ./
 RUN npm install
 
-# Configure Vite for proper host binding
+# Copy configuration files
 COPY ./vite.config.js ./
 COPY ./index.html ./
 COPY ./tsconfig.json ./
 
-# Set up application source code
-COPY ./src ./src
+# Copy source files to appropriate location
+# Note: The actual source files will be mounted from the host at runtime
+# via the volume mapping in docker-compose.yml
 
 EXPOSE 8080
 
