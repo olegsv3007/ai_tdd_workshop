@@ -3,6 +3,7 @@
     class="task-card"
     draggable="true"
     @dragstart="$emit('dragstart', $event, task)"
+    @click="$emit('click', task)"
   >
     <div class="task-card-header flex align-items-center justify-content-between mb-2">
       <div class="flex align-items-center">
@@ -51,6 +52,7 @@ defineProps<{
 
 defineEmits<{
   dragstart: [event: DragEvent, task: Task];
+  click: [task: Task];
 }>();
 
 // Shorten description for display
@@ -89,7 +91,7 @@ const getPrioritySeverity = (priority: TaskPriority): string => {
   border-radius: 8px;
   padding: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  cursor: grab;
+  cursor: pointer;
   transition: all 0.3s cubic-bezier(.25,.8,.25,1);
   border-left: 3px solid var(--primary-color);
 }
@@ -103,11 +105,16 @@ const getPrioritySeverity = (priority: TaskPriority): string => {
   cursor: grabbing;
 }
 
+.task-card[draggable="true"] {
+  cursor: grab;
+}
+
 .task-title {
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
@@ -116,6 +123,7 @@ const getPrioritySeverity = (priority: TaskPriority): string => {
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   color: var(--text-color-secondary);
 }

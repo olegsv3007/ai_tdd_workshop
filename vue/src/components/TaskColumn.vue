@@ -14,6 +14,7 @@
         :key="task.id"
         :task="task"
         @dragstart="onDragStart"
+        @click="onTaskClick"
         class="mb-3"
       />
       
@@ -37,6 +38,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'task-dropped': [task: Task, newStatus: TaskStatus];
+  'task-click': [task: Task];
 }>();
 
 const onDragStart = (event: DragEvent, task: Task) => {
@@ -55,6 +57,10 @@ const onDrop = (event: DragEvent) => {
       emit('task-dropped', task, props.status);
     }
   }
+};
+
+const onTaskClick = (task: Task) => {
+  emit('task-click', task);
 };
 </script>
 

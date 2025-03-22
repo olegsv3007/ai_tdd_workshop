@@ -34,10 +34,19 @@
         <TaskColumn 
           :status="status" 
           :tasks="getTasksByStatus(status)"
-          @task-dropped="handleTaskDropped" 
+          @task-dropped="handleTaskDropped"
+          @task-click="openTaskDetail" 
         />
       </div>
     </div>
+    
+    <!-- Task Detail Modal -->
+    <TaskDetail
+      :visible="taskDetailVisible"
+      @update:visible="taskDetailVisible = $event"
+      :task="selectedTask"
+      @task-updated="handleTaskUpdated"
+    />
   </div>
 </template>
 
@@ -46,6 +55,7 @@ import { ref, onMounted, computed } from 'vue';
 import { Task, TaskStatus } from '../types/Task';
 import { taskApi } from '../api/taskApi';
 import TaskColumn from './TaskColumn.vue';
+import TaskDetail from './TaskDetail.vue';
 import Button from 'primevue/button';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useToast } from 'primevue/usetoast';
@@ -54,6 +64,10 @@ const toast = useToast();
 const loading = ref(true);
 const tasks = ref<Task[]>([]);
 const statuses: TaskStatus[] = ['To Do', 'In Progress', 'Review', 'Done'];
+
+// Task detail modal state
+const taskDetailVisible = ref(false);
+const selectedTask = ref<Task | null>(null);
 
 // Get tasks for a specific status
 const getTasksByStatus = (status: TaskStatus): Task[] => {
@@ -114,6 +128,27 @@ const loadTasks = async () => {
     });
   } finally {
     loading.value = false;
+  }
+};
+
+// Open task detail modal
+const openTaskDetail = (task: Task) => {
+  selectedTask.value = task;
+  taskDetailVisible.value = true;
+};
+
+// Handle updated task from the modal
+const handleTaskUpdated = (updatedTask: Task) => {
+  // Find and update the task in our local state
+  const taskIndex = tasks.value.findIndex(t => t.id === updatedTask.id);
+  if (taskIndex !== -1) {
+    // Create a new array to trigger reactivity
+    const updatedTasks = [...tasks.value];
+    updatedTasks[taskIndex] = updatedTask;
+    tasks.value = updatedTasks;
+    
+    // Update the selected task reference to reflect changes
+    selectedTask.value = updatedTask;
   }
 };
 

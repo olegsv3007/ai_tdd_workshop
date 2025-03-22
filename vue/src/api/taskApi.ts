@@ -118,6 +118,28 @@ export class TaskApiClient {
     
     return updatedTask;
   }
+
+  async updateTask(taskId: number, taskData: Partial<Task>): Promise<Task> {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 400));
+    
+    const taskIndex = this.tasks.findIndex(task => task.id === taskId);
+    if (taskIndex === -1) {
+      throw new Error(`Task with ID ${taskId} not found`);
+    }
+    
+    // Create a new task with updated data
+    const updatedTask = {
+      ...this.tasks[taskIndex],
+      ...taskData,
+      updatedAt: new Date().toISOString()
+    };
+    
+    // Update the tasks array
+    this.tasks[taskIndex] = updatedTask;
+    
+    return updatedTask;
+  }
 }
 
 // Create a singleton instance
