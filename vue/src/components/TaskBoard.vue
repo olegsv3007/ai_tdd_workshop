@@ -18,9 +18,7 @@
           label="Create Task" 
           icon="pi pi-plus" 
           severity="success"
-          disabled
-          tooltip="Coming soon in future version"
-          tooltipOptions="{ position: 'bottom' }"
+          @click="createNewTask"
         />
       </div>
     </div>
@@ -45,7 +43,10 @@
       :visible="taskDetailVisible"
       @update:visible="taskDetailVisible = $event"
       :task="selectedTask"
+      :is-creating="isCreatingTask"
       @task-updated="handleTaskUpdated"
+      @task-created="handleTaskCreated"
+      @task-deleted="handleTaskDeleted"
     />
   </div>
 </template>
@@ -68,6 +69,7 @@ const statuses: TaskStatus[] = ['To Do', 'In Progress', 'Review', 'Done'];
 // Task detail modal state
 const taskDetailVisible = ref(false);
 const selectedTask = ref<Task | null>(null);
+const isCreatingTask = ref(false);
 
 // Get tasks for a specific status
 const getTasksByStatus = (status: TaskStatus): Task[] => {
@@ -134,6 +136,14 @@ const loadTasks = async () => {
 // Open task detail modal
 const openTaskDetail = (task: Task) => {
   selectedTask.value = task;
+  isCreatingTask.value = false;
+  taskDetailVisible.value = true;
+};
+
+// Open create task modal
+const createNewTask = () => {
+  selectedTask.value = null;
+  isCreatingTask.value = true;
   taskDetailVisible.value = true;
 };
 
@@ -150,6 +160,32 @@ const handleTaskUpdated = (updatedTask: Task) => {
     // Update the selected task reference to reflect changes
     selectedTask.value = updatedTask;
   }
+};
+
+// Handle newly created task from the modal
+const handleTaskCreated = (newTask: Task) => {
+  // Add the new task to our local state
+  tasks.value = [...tasks.value, newTask];
+  
+  toast.add({
+    severity: 'success',
+    summary: 'Task Created',
+    detail: `Task #${newTask.id} has been created successfully`,
+    life: 3000
+  });
+};
+
+// Handle deleted task from the modal
+const handleTaskDeleted = (taskId: number) => {
+  // Remove the task from our local state
+  tasks.value = tasks.value.filter(task => task.id !== taskId);
+  
+  toast.add({
+    severity: 'info',
+    summary: 'Task Deleted',
+    detail: `Task #${taskId} has been removed from the board`,
+    life: 3000
+  });
 };
 
 // Load tasks on component mount

@@ -1,7 +1,8 @@
 <template>
+  <ConfirmDialog></ConfirmDialog>
   <Dialog 
     :visible="visible" 
-    :header="task ? `Task #${task.id}: ${isEditing ? 'Edit' : 'View'} Details` : ''" 
+    :header="getDialogHeader()" 
     :modal="true"
     :closable="true"
     :dismissableMask="true"
@@ -10,82 +11,13 @@
     @update:visible="(value) => emit('update:visible', value)"
     @hide="closeDialog"
   >
-    <div v-if="task" class="task-detail">
+    <div class="task-detail">
       <div v-if="loading" class="flex justify-content-center p-4">
         <ProgressSpinner />
       </div>
-      <div v-else>
-        <!-- View Mode -->
-        <div v-if="!isEditing" class="task-view-mode">
-          <div class="grid mb-4">
-            <div class="col-12 md:col-6">
-              <div class="task-metadata flex align-items-center gap-2 mb-3">
-                <Tag :value="task.type" :severity="getTypeSeverity(task.type)" />
-                <Tag :value="task.priority" :severity="getPrioritySeverity(task.priority)" />
-                <Tag :value="task.status" severity="info" />
-              </div>
-              
-              <h2 class="task-title text-xl font-bold mb-2">{{ task.title }}</h2>
-              
-              <div class="task-creators grid mb-3">
-                <div class="col-6">
-                  <div class="flex align-items-center">
-                    <Avatar icon="pi pi-user" size="small" class="mr-2" />
-                    <div>
-                      <div class="text-xs text-color-secondary">Assignee</div>
-                      <div>{{ task.assignee || 'Unassigned' }}</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="flex align-items-center">
-                    <Avatar icon="pi pi-user-edit" size="small" class="mr-2" />
-                    <div>
-                      <div class="text-xs text-color-secondary">Reporter</div>
-                      <div>{{ task.reporter }}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="task-dates grid mb-3">
-                <div class="col-6">
-                  <div class="text-xs text-color-secondary">Created</div>
-                  <div>{{ formatDate(task.createdAt) }}</div>
-                </div>
-                <div class="col-6">
-                  <div class="text-xs text-color-secondary">Updated</div>
-                  <div>{{ formatDate(task.updatedAt) }}</div>
-                </div>
-              </div>
-              
-              <div class="text-xs text-color-secondary mb-1">Estimated Hours</div>
-              <div class="mb-4">{{ task.estimatedHours ? `${task.estimatedHours}h` : 'No estimate' }}</div>
-            </div>
-            
-            <div class="col-12 md:col-6">
-              <div class="text-xs text-color-secondary mb-1">Description</div>
-              <p class="task-description mb-4 p-2 border-1 border-round surface-ground" style="min-height: 150px">
-                {{ task.description }}
-              </p>
-              
-              <div v-if="task.tags && task.tags.length > 0" class="task-tags mt-3">
-                <div class="text-xs text-color-secondary mb-1">Tags</div>
-                <div class="flex flex-wrap gap-1">
-                  <Tag
-                    v-for="tag in task.tags"
-                    :key="tag"
-                    :value="tag"
-                    severity="secondary"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Edit Mode -->
-        <div v-else class="task-edit-mode">
+      <div v-else-if="isCreating || isEditing">
+        <!-- Create/Edit Mode -->
+        <div class="task-edit-mode">
           <div class="p-fluid">
             <div class="grid mb-4">
               <div class="col-12 md:col-6">
@@ -187,20 +119,101 @@
           </div>
         </div>
       </div>
+      <div v-else-if="task">
+        <!-- View Mode -->
+        <!-- View Mode -->
+        <div class="task-view-mode">
+          <div class="grid mb-4">
+            <div class="col-12 md:col-6">
+              <div class="task-metadata flex align-items-center gap-2 mb-3">
+                <Tag :value="task.type" :severity="getTypeSeverity(task.type)" />
+                <Tag :value="task.priority" :severity="getPrioritySeverity(task.priority)" />
+                <Tag :value="task.status" severity="info" />
+              </div>
+              
+              <h2 class="task-title text-xl font-bold mb-2">{{ task.title }}</h2>
+              
+              <div class="task-creators grid mb-3">
+                <div class="col-6">
+                  <div class="flex align-items-center">
+                    <Avatar icon="pi pi-user" size="small" class="mr-2" />
+                    <div>
+                      <div class="text-xs text-color-secondary">Assignee</div>
+                      <div>{{ task.assignee || 'Unassigned' }}</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="flex align-items-center">
+                    <Avatar icon="pi pi-user-edit" size="small" class="mr-2" />
+                    <div>
+                      <div class="text-xs text-color-secondary">Reporter</div>
+                      <div>{{ task.reporter }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-dates grid mb-3">
+                <div class="col-6">
+                  <div class="text-xs text-color-secondary">Created</div>
+                  <div>{{ formatDate(task.createdAt) }}</div>
+                </div>
+                <div class="col-6">
+                  <div class="text-xs text-color-secondary">Updated</div>
+                  <div>{{ formatDate(task.updatedAt) }}</div>
+                </div>
+              </div>
+              
+              <div class="text-xs text-color-secondary mb-1">Estimated Hours</div>
+              <div class="mb-4">{{ task.estimatedHours ? `${task.estimatedHours}h` : 'No estimate' }}</div>
+            </div>
+            
+            <div class="col-12 md:col-6">
+              <div class="text-xs text-color-secondary mb-1">Description</div>
+              <p class="task-description mb-4 p-2 border-1 border-round surface-ground" style="min-height: 150px">
+                {{ task.description }}
+              </p>
+              
+              <div v-if="task.tags && task.tags.length > 0" class="task-tags mt-3">
+                <div class="text-xs text-color-secondary mb-1">Tags</div>
+                <div class="flex flex-wrap gap-1">
+                  <Tag
+                    v-for="tag in task.tags"
+                    :key="tag"
+                    :value="tag"
+                    severity="secondary"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+
+      </div>
     </div>
     
     <template #footer>
       <div class="flex justify-content-between">
         <div>
           <Button
-            v-if="!isEditing"
+            v-if="task && !isEditing && !isCreating"
             label="Edit Task"
             icon="pi pi-pencil"
             severity="secondary"
             @click="startEditing"
+            class="mr-2"
           />
           <Button
-            v-if="isEditing"
+            v-if="task && !isEditing && !isCreating"
+            label="Delete"
+            icon="pi pi-trash"
+            severity="danger"
+            @click="confirmDelete"
+          />
+          <Button
+            v-if="isEditing && !isCreating"
             label="Cancel"
             icon="pi pi-times"
             severity="secondary"
@@ -210,11 +223,19 @@
         </div>
         <div>
           <Button
-            v-if="isEditing"
+            v-if="isEditing && !isCreating"
             label="Save"
             icon="pi pi-save"
             severity="success"
             @click="saveTask"
+            :loading="saving"
+          />
+          <Button
+            v-if="isCreating"
+            label="Create"
+            icon="pi pi-plus"
+            severity="success"
+            @click="createTask"
             :loading="saving"
           />
           <Button
@@ -235,6 +256,7 @@ import { ref, computed, watch, defineProps, defineEmits } from 'vue';
 import { Task, TaskStatus, TaskType, TaskPriority } from '../types/Task';
 import { taskApi } from '../api/taskApi';
 import { useToast } from 'primevue/usetoast';
+import { useConfirm } from 'primevue/useconfirm';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Dropdown from 'primevue/dropdown';
@@ -245,18 +267,23 @@ import Chips from 'primevue/chips';
 import ProgressSpinner from 'primevue/progressspinner';
 import Tag from 'primevue/tag';
 import Avatar from 'primevue/avatar';
+import ConfirmDialog from 'primevue/confirmdialog';
 
 const props = defineProps<{
   visible: boolean;
   task: Task | null;
+  isCreating?: boolean;
 }>();
 
 const emit = defineEmits<{
   'update:visible': [value: boolean];
   'task-updated': [updatedTask: Task];
+  'task-created': [newTask: Task];
+  'task-deleted': [taskId: number];
 }>();
 
 const toast = useToast();
+const confirm = useConfirm();
 const loading = ref(false);
 const saving = ref(false);
 const isEditing = ref(false);
@@ -270,14 +297,40 @@ const taskTypes: TaskType[] = ['Bug', 'Feature', 'Epic', 'Story', 'Task'];
 const taskPriorities: TaskPriority[] = ['Low', 'Medium', 'High', 'Critical'];
 const taskStatuses: TaskStatus[] = ['To Do', 'In Progress', 'Review', 'Done'];
 
-// Reset form when task changes
-watch(() => props.task, (newTask) => {
-  if (newTask) {
+// Set default values for new task
+const getDefaultTask = (): Partial<Task> => {
+  return {
+    title: '',
+    description: '',
+    status: 'To Do',
+    type: 'Task',
+    priority: 'Medium',
+    assignee: null,
+    tags: []
+  };
+};
+
+// Reset form when task or isCreating changes
+watch([() => props.task, () => props.isCreating], ([newTask, newIsCreating]) => {
+  if (newIsCreating) {
+    // Creating a new task
+    editedTask.value = getDefaultTask();
+    isEditing.value = true;
+    titleError.value = false;
+  } else if (newTask) {
+    // Editing an existing task
     editedTask.value = { ...newTask };
     isEditing.value = false;
     titleError.value = false;
   }
 }, { immediate: true });
+
+// Get the dialog header based on current state
+const getDialogHeader = (): string => {
+  if (props.isCreating) return 'Create New Task';
+  if (!props.task) return '';
+  return `Task #${props.task.id}: ${isEditing.value ? 'Edit' : 'View'} Details`;
+};
 
 // Start editing mode
 const startEditing = () => {
@@ -328,6 +381,78 @@ const saveTask = async () => {
       severity: 'error',
       summary: 'Error',
       detail: 'Failed to update task',
+      life: 3000
+    });
+  } finally {
+    saving.value = false;
+  }
+};
+
+// Create a new task
+const createTask = async () => {
+  if (!editedTask.value.title?.trim()) {
+    titleError.value = true;
+    return;
+  }
+  
+  saving.value = true;
+  try {
+    const newTask = await taskApi.createTask(editedTask.value);
+    
+    emit('task-created', newTask);
+    closeDialog();
+  } catch (error) {
+    console.error('Error creating task:', error);
+    
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to create task',
+      life: 3000
+    });
+  } finally {
+    saving.value = false;
+  }
+};
+
+// Confirm task deletion
+const confirmDelete = () => {
+  if (!props.task) return;
+  
+  confirm.require({
+    message: `Are you sure you want to delete task #${props.task.id}: "${props.task.title}"?`,
+    header: 'Delete Confirmation',
+    icon: 'pi pi-exclamation-triangle',
+    acceptClass: 'p-button-danger',
+    accept: deleteTask,
+    reject: () => {}
+  });
+};
+
+// Delete the task
+const deleteTask = async () => {
+  if (!props.task?.id) return;
+  
+  saving.value = true;
+  try {
+    await taskApi.deleteTask(props.task.id);
+    
+    toast.add({
+      severity: 'success',
+      summary: 'Task Deleted',
+      detail: `Task #${props.task.id} has been deleted successfully`,
+      life: 3000
+    });
+    
+    emit('task-deleted', props.task.id);
+    closeDialog();
+  } catch (error) {
+    console.error('Error deleting task:', error);
+    
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to delete task',
       life: 3000
     });
   } finally {

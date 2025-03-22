@@ -140,6 +140,52 @@ export class TaskApiClient {
     
     return updatedTask;
   }
+
+  async createTask(taskData: Partial<Task>): Promise<Task> {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Generate a new ID (highest ID + 1)
+    const newId = this.tasks.length > 0 
+      ? Math.max(...this.tasks.map(task => task.id)) + 1 
+      : 1;
+    
+    const now = new Date().toISOString();
+    
+    // Create new task with defaults
+    const newTask: Task = {
+      id: newId,
+      title: taskData.title || 'New Task',
+      description: taskData.description || '',
+      status: taskData.status || 'To Do',
+      type: taskData.type || 'Task',
+      priority: taskData.priority || 'Medium',
+      assignee: taskData.assignee || null,
+      reporter: taskData.reporter || 'Current User', // In a real app, this would be the current user
+      createdAt: now,
+      updatedAt: now,
+      estimatedHours: taskData.estimatedHours || null,
+      tags: taskData.tags || []
+    };
+    
+    // Add to tasks array
+    this.tasks.push(newTask);
+    
+    return newTask;
+  }
+  
+  async deleteTask(taskId: number): Promise<void> {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 400));
+    
+    const taskIndex = this.tasks.findIndex(task => task.id === taskId);
+    if (taskIndex === -1) {
+      throw new Error(`Task with ID ${taskId} not found`);
+    }
+    
+    // Remove the task from the array
+    this.tasks.splice(taskIndex, 1);
+  }
 }
 
 // Create a singleton instance
