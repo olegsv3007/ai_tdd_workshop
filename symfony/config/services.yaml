@@ -56,3 +56,8 @@ services:
     App\Application\Bus\CommandBusContract:
         alias: App\Infrastructure\Bus\CommandBus
         public: true
+
+    # Query Handlers
+    App\Application\Query\Handler\GetAllTasksQueryHandler:
+        tags:
+            - { name: messenger.message_handler, bus: query.bus, handles: App\Application\Query\GetAllTasksQuery }
