@@ -1,0 +1,29 @@
+# Project description
+- This is a small demo of task tracker application. It containes only CRUD for tasks and dasboard.
+
+# Project Structure & Architecture
+- Project is running in docker environment, so if you need to run commands, run it trough docker.
+- Follow DDD and CQRS Approach.
+- Use Layer architecture (Infrastructure, Application, Domain).
+- Project works on the following stack:
+    - PHP 8.4.
+    - Symfony 7.2.
+    - Mysql 8.
+    - Vite.
+    - Vue 3 with typescript.
+    - Primevue 4.
+
+# General Code Style & Formatting
+- Follow PSR Standards.
+- Create necessary types.
+- Add doctrine entity mapping and validation in xml.
+- Avoid magic numbers and define constants.
+
+# Functions & Logic
+- Keep functions short and single-purpose (<20 lines).
+- Avoid deeply nested blocks.
+- Using early exit.
+- Extracting logic into utility functions.
+- Use higher-order functions (map, filter, reduce) to simplify logic.
+- Use arrow functions for simple cases (<3 instructions), named functions otherwise.
+- Use RO-RO (Receive Object, Return Object) for passing and returning multiple parameters.

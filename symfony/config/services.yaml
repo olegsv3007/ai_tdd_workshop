@@ -17,8 +17,24 @@ services:
         resource: '../src/'
         exclude:
             - '../src/DependencyInjection/'
-            - '../src/Entity/'
+            - '../src/Domain/Entity/'
             - '../src/Kernel.php'
+
+    # Domain layer repositories
+    App\Domain\Repository\TaskRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Repository\DoctrineTaskRepository
+        
+    App\Domain\Repository\TaskTagRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Repository\DoctrineTaskTagRepository
+
+    # Infrastructure layer repositories
+    App\Infrastructure\Persistence\Doctrine\Repository\DoctrineTaskRepository:
+        arguments:
+            $registry: '@Doctrine\Persistence\ManagerRegistry'
+            
+    App\Infrastructure\Persistence\Doctrine\Repository\DoctrineTaskTagRepository:
+        arguments:
+            $registry: '@Doctrine\Persistence\ManagerRegistry'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

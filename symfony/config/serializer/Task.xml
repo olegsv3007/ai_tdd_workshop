@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<serializer xmlns="http://symfony.com/schema/dic/serializer-mapping"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://symfony.com/schema/dic/serializer-mapping
+                https://symfony.com/schema/dic/serializer-mapping/serializer-mapping-1.0.xsd">
+
+    <class name="App\Domain\Entity\Task">
+        <attribute name="id">
+            <group>task:read</group>
+        </attribute>
+        <attribute name="title">
+            <group>task:read</group>
+        </attribute>
+        <attribute name="description">
+            <group>task:read</group>
+        </attribute>
+        <attribute name="status">
+            <group>task:read</group>
+        </attribute>
+        <attribute name="type">
+            <group>task:read</group>
+        </attribute>
+        <attribute name="priority">
+            <group>task:read</group>
+        </attribute>
+        <attribute name="assignee">
+            <group>task:read</group>
+        </attribute>
+        <attribute name="reporter">
+            <group>task:read</group>
+        </attribute>
+        <attribute name="createdAt">
+            <group>task:read</group>
+        </attribute>
+        <attribute name="updatedAt">
+            <group>task:read</group>
+        </attribute>
+        <attribute name="estimatedHours">
+            <group>task:read</group>
+        </attribute>
+        <attribute name="tags" max-depth="1">
+            <group>task:read</group>
+        </attribute>
+    </class>
+</serializer>

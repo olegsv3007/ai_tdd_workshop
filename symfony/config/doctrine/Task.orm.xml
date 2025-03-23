@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                   https://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
+
+    <entity name="App\Domain\Entity\Task" table="tasks">
+        <lifecycle-callbacks>
+            <lifecycle-callback type="preUpdate" method="preUpdate"/>
+        </lifecycle-callbacks>
+
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO"/>
+        </id>
+
+        <field name="title" type="string" length="255">
+            <options>
+                <option name="comment">Task title</option>
+            </options>
+        </field>
+        <field name="description" type="text">
+            <options>
+                <option name="comment">Task description</option>
+            </options>
+        </field>
+        <field name="status" type="string" length="50" enum-type="App\Domain\Enum\TaskStatus">
+            <options>
+                <option name="comment">Task status (To Do, In Progress, Review, Done)</option>
+            </options>
+        </field>
+        <field name="type" type="string" length="50" enum-type="App\Domain\Enum\TaskType">
+            <options>
+                <option name="comment">Task type (Bug, Feature, Epic, Story, Task)</option>
+            </options>
+        </field>
+        <field name="priority" type="string" length="50" enum-type="App\Domain\Enum\TaskPriority">
+            <options>
+                <option name="comment">Task priority (Low, Medium, High, Critical)</option>
+            </options>
+        </field>
+        <field name="assignee" type="string" length="255" nullable="true">
+            <options>
+                <option name="comment">Person assigned to the task</option>
+            </options>
+        </field>
+        <field name="reporter" type="string" length="255">
+            <options>
+                <option name="comment">Person who reported the task</option>
+            </options>
+        </field>
+        <field name="estimatedHours" type="float" nullable="true">
+            <options>
+                <option name="comment">Estimated hours to complete the task</option>
+            </options>
+        </field>
+        <field name="createdAt" type="datetime_immutable">
+            <options>
+                <option name="comment">When the task was created</option>
+            </options>
+        </field>
+        <field name="updatedAt" type="datetime_immutable">
+            <options>
+                <option name="comment">When the task was last updated</option>
+            </options>
+        </field>
+        
+        <one-to-many field="tags" target-entity="App\Domain\Entity\TaskTag" mapped-by="task" orphan-removal="true">
+            <cascade>
+                <cascade-persist/>
+                <cascade-remove/>
+            </cascade>
+        </one-to-many>
+    </entity>
+
+</doctrine-mapping>

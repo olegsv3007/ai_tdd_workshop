@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<serializer xmlns="http://symfony.com/schema/dic/serializer-mapping"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://symfony.com/schema/dic/serializer-mapping
+                https://symfony.com/schema/dic/serializer-mapping/serializer-mapping-1.0.xsd">
+
+    <class name="App\Domain\Entity\TaskTag">
+        <attribute name="id">
+            <group>task:read</group>
+        </attribute>
+        <attribute name="name">
+            <group>task:read</group>
+        </attribute>
+        <attribute name="task" max-depth="0">
+            <!-- Only include task in write operations, exclude from read to prevent circular references -->
+            <group>task:write</group>
+        </attribute>
+    </class>
+</serializer>

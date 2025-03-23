@@ -38,6 +38,18 @@ docker-compose up -d --build
 - Username: symfony
 - Password: symfony
 
+## Loading Test Data
+
+The application comes with task fixtures that can be loaded to quickly populate the database with test data.
+
+To load 20 test tasks with random properties and tags:
+
+```bash
+docker compose exec php php bin/console app:load-task-fixtures
+```
+
+This will clear any existing tasks and tags before creating new ones.
+
 ## Services
 
 - PHP: PHP-FPM 8.4 for Symfony backend
