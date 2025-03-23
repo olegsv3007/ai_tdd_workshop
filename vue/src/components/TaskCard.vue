@@ -33,8 +33,8 @@
     <div v-if="task.tags && task.tags.length > 0" class="task-tags flex flex-wrap gap-1 mt-2">
       <Tag
         v-for="tag in task.tags"
-        :key="tag"
-        :value="tag"
+        :key="tag.id"
+        :value="tag.name"
         severity="secondary"
         class="text-xs"
       />
