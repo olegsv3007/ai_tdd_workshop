@@ -1,4 +1,5 @@
 doctrine:
     dbal:
-        # Use the same database connection but with a suffix for test isolation
-        dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+        # Use a dedicated test database
+        url: '%env(resolve:DATABASE_URL)%'
+        dbname_suffix: '_test'

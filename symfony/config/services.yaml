@@ -47,3 +47,12 @@ services:
     App\Infrastructure\Bus\CommandBus:
         arguments:
             $commandBus: '@command.bus'
+            
+    # Bus contracts
+    App\Application\Bus\QueryBusContract:
+        alias: App\Infrastructure\Bus\QueryBus
+        public: true
+        
+    App\Application\Bus\CommandBusContract:
+        alias: App\Infrastructure\Bus\CommandBus
+        public: true
