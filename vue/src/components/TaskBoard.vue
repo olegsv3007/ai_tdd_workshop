@@ -10,7 +10,7 @@
           icon="pi pi-refresh" 
           outlined 
           :loading="loading" 
-          @click="loadTasks"
+          @click="refreshTasks"
           tooltip="Refresh Tasks"
           tooltipOptions="{ position: 'bottom' }"
         />
@@ -52,9 +52,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { Task, TaskStatus } from '../types/Task';
-import { taskApi } from '../api/taskApi';
+import { useTasks } from '../composables/useTasks';
 import TaskColumn from './TaskColumn.vue';
 import TaskDetail from './TaskDetail.vue';
 import Button from 'primevue/button';
@@ -62,9 +62,19 @@ import ProgressSpinner from 'primevue/progressspinner';
 import { useToast } from 'primevue/usetoast';
 
 const toast = useToast();
-const loading = ref(true);
-const tasks = ref<Task[]>([]);
 const statuses: TaskStatus[] = ['To Do', 'In Progress', 'Review', 'Done'];
+
+// Use the tasks composable
+const {
+  tasks,
+  isLoading: loading,
+  error,
+  loadTasks,
+  updateTaskStatus,
+  createTask,
+  updateTask,
+  deleteTask
+} = useTasks();
 
 // Task detail modal state
 const taskDetailVisible = ref(false);
@@ -79,20 +89,8 @@ const getTasksByStatus = (status: TaskStatus): Task[] => {
 // Handle task drop event
 const handleTaskDropped = async (task: Task, newStatus: TaskStatus) => {
   try {
-    // Optimistically update UI
-    const taskIndex = tasks.value.findIndex(t => t.id === task.id);
-    if (taskIndex !== -1) {
-      // Create a new array to trigger reactivity
-      const updatedTasks = [...tasks.value];
-      updatedTasks[taskIndex] = {
-        ...updatedTasks[taskIndex],
-        status: newStatus
-      };
-      tasks.value = updatedTasks;
-    }
-    
-    // Call API to update task
-    await taskApi.updateTaskStatus(task.id, newStatus);
+    // Call API to update task status
+    await updateTaskStatus(task.id, newStatus);
     
     toast.add({
       severity: 'success',
@@ -115,11 +113,10 @@ const handleTaskDropped = async (task: Task, newStatus: TaskStatus) => {
   }
 };
 
-// Load tasks from API
-const loadTasks = async () => {
-  loading.value = true;
+// Load tasks from API - this is now handled by the useTasks composable
+const refreshTasks = async () => {
   try {
-    tasks.value = await taskApi.getAllTasks();
+    await loadTasks();
   } catch (error) {
     console.error('Error loading tasks:', error);
     toast.add({
@@ -128,8 +125,6 @@ const loadTasks = async () => {
       detail: 'Failed to load tasks',
       life: 3000
     });
-  } finally {
-    loading.value = false;
   }
 };
 
@@ -148,49 +143,73 @@ const createNewTask = () => {
 };
 
 // Handle updated task from the modal
-const handleTaskUpdated = (updatedTask: Task) => {
-  // Find and update the task in our local state
-  const taskIndex = tasks.value.findIndex(t => t.id === updatedTask.id);
-  if (taskIndex !== -1) {
-    // Create a new array to trigger reactivity
-    const updatedTasks = [...tasks.value];
-    updatedTasks[taskIndex] = updatedTask;
-    tasks.value = updatedTasks;
+const handleTaskUpdated = async (updatedTask: Task) => {
+  try {
+    // The updateTask method in useTasks will handle updating the local state
+    await updateTask(updatedTask.id, updatedTask);
     
     // Update the selected task reference to reflect changes
     selectedTask.value = updatedTask;
+  } catch (error) {
+    console.error('Error updating task:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to update task',
+      life: 3000
+    });
   }
 };
 
 // Handle newly created task from the modal
-const handleTaskCreated = (newTask: Task) => {
-  // Add the new task to our local state
-  tasks.value = [...tasks.value, newTask];
-  
-  toast.add({
-    severity: 'success',
-    summary: 'Task Created',
-    detail: `Task #${newTask.id} has been created successfully`,
-    life: 3000
-  });
+const handleTaskCreated = async (newTask: Task) => {
+  try {
+    // The createTask method in useTasks will handle adding to the local state
+    const createdTask = await createTask(newTask);
+    
+    toast.add({
+      severity: 'success',
+      summary: 'Task Created',
+      detail: `Task #${createdTask.id} has been created successfully`,
+      life: 3000
+    });
+  } catch (error) {
+    console.error('Error creating task:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to create task',
+      life: 3000
+    });
+  }
 };
 
 // Handle deleted task from the modal
-const handleTaskDeleted = (taskId: number) => {
-  // Remove the task from our local state
-  tasks.value = tasks.value.filter(task => task.id !== taskId);
-  
-  toast.add({
-    severity: 'info',
-    summary: 'Task Deleted',
-    detail: `Task #${taskId} has been removed from the board`,
-    life: 3000
-  });
+const handleTaskDeleted = async (taskId: number) => {
+  try {
+    // The deleteTask method in useTasks will handle removing from the local state
+    await deleteTask(taskId);
+    
+    toast.add({
+      severity: 'info',
+      summary: 'Task Deleted',
+      detail: `Task #${taskId} has been removed from the board`,
+      life: 3000
+    });
+  } catch (error) {
+    console.error('Error deleting task:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to delete task',
+      life: 3000
+    });
+  }
 };
 
 // Load tasks on component mount
 onMounted(() => {
-  loadTasks();
+  refreshTasks();
 });
 </script>
 
