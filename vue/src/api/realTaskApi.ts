@@ -9,7 +9,7 @@ class TaskApiClient {
   
   constructor() {
     // Base URL for the API - adjust as needed for your environment
-    this.baseUrl = '/api';
+    this.baseUrl = 'http://localhost/api';
     this.headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
