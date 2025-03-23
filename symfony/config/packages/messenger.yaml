@@ -15,10 +15,16 @@ framework:
             failed: 'doctrine://default?queue_name=failed'
             # sync: 'sync://'
 
-        default_bus: messenger.bus.default
+        default_bus: command.bus
 
         buses:
-            messenger.bus.default: []
+            command.bus:
+                middleware:
+                    - validation
+                    - doctrine_transaction
+            query.bus:
+                middleware:
+                    - validation
 
         routing:
             Symfony\Component\Mailer\Messenger\SendEmailMessage: async

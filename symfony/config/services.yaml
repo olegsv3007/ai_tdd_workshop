@@ -38,3 +38,12 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    
+    # Bus services
+    App\Infrastructure\Bus\QueryBus:
+        arguments:
+            $queryBus: '@query.bus'
+            
+    App\Infrastructure\Bus\CommandBus:
+        arguments:
+            $commandBus: '@command.bus'
