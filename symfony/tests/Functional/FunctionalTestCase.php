@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional;
 
+use App\Application\Bus\CommandBusContract;
 use App\Application\Bus\QueryBusContract;
 use App\Tests\Fixture\AbstractFixture;
 use Doctrine\ORM\EntityManagerInterface;
@@ -64,14 +65,26 @@ abstract class FunctionalTestCase extends KernelTestCase
         $this->entityManager = null;
         $this->container = null;
     }
-    
-    /**
-     * Get the real query bus from the container
-     * 
-     * @return QueryBusContract
-     */
+
     protected function getQueryBus(): QueryBusContract
     {
         return $this->container->get(QueryBusContract::class);
+    }
+
+    protected function getCommandBus(): CommandBusContract
+    {
+        return $this->container->get(CommandBusContract::class);
+    }
+
+    /**
+     * @template T
+     *
+     * @param class-string<T> $className
+     *
+     * @return T
+     */
+    protected static function getService(string $className): object
+    {
+        return self::getContainer()->get($className);
     }
 }
