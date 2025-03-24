@@ -9,4 +9,9 @@ enum TaskType: string
     case EPIC = 'Epic';
     case STORY = 'Story';
     case TASK = 'Task';
+
+    public static function getValues(): array
+    {
+        return array_column(self::cases(), 'value');
+    }
 }
