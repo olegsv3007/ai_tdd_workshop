@@ -159,6 +159,8 @@ const handleTaskUpdated = async (updatedTask: Task) => {
       life: 3000
     });
   }
+
+  await loadTasks();
 };
 
 // Handle newly created task from the modal
@@ -182,6 +184,8 @@ const handleTaskCreated = async (newTask: Task) => {
       life: 3000
     });
   }
+
+  await loadTasks();
 };
 
 // Handle deleted task from the modal
@@ -205,6 +209,8 @@ const handleTaskDeleted = async (taskId: number) => {
       life: 3000
     });
   }
+
+  await loadTasks();
 };
 
 // Load tasks on component mount

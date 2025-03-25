@@ -404,16 +404,14 @@ const saveTask = async () => {
   
   saving.value = true;
   try {
-    const updatedTask = await taskApi.updateTask(props.task.id, editedTask.value);
-    
+    emit('task-updated', editedTask.value);
+
     toast.add({
       severity: 'success',
       summary: 'Task Updated',
-      detail: `Task #${updatedTask.id} was updated successfully`,
+      detail: `Task #${editedTask.id} was updated successfully`,
       life: 3000
     });
-    
-    emit('task-updated', updatedTask);
     isEditing.value = false;
   } catch (error) {
     console.error('Error updating task:', error);
@@ -438,9 +436,7 @@ const createTask = async () => {
   
   saving.value = true;
   try {
-    const newTask = await taskApi.createTask(editedTask.value);
-    
-    emit('task-created', newTask);
+    emit('task-created', editedTask.value);
     closeDialog();
   } catch (error) {
     console.error('Error creating task:', error);
@@ -458,14 +454,14 @@ const createTask = async () => {
 
 // Confirm task deletion
 const confirmDelete = () => {
-  if (!props.task) return;
+  if (!props.task.id) return;
   
   confirm.require({
     message: `Are you sure you want to delete task #${props.task.id}: "${props.task.title}"?`,
     header: 'Delete Confirmation',
     icon: 'pi pi-exclamation-triangle',
     acceptClass: 'p-button-danger',
-    accept: deleteTask,
+    accept: () => emit('task-deleted', props.task.id),
     reject: () => {}
   });
 };
