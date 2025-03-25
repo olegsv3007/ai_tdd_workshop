@@ -64,6 +64,43 @@ class TaskControllerTest extends AcceptanceTestCase
         self::assertTaskCreatedContainsDataFromRequest($createdTask, $requestBody);
     }
 
+    public function testUpdateTask(): void
+    {
+        $existingTask = $this->loadTask();
+
+        $requestBody = [
+            'title' => 'Task Title',
+            'description' => 'Task Description',
+            'type' => 'Task',
+            'priority' => 'Medium',
+            'status' => 'To Do',
+            'reporter' => 'Reporter User',
+            'assignee' => 'Assignee User',
+            'estimatedHours' => 3.0,
+            'tags' => ['tag1', 'tag2'],
+        ];
+
+        $this->client->request(
+            'PUT',
+            sprintf('/api/tasks/%d', $existingTask->getId()),
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode($requestBody)
+        );
+
+        $updatedTask = $this->taskRepository->findById($existingTask->getId());
+
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('Content-Type', 'application/json');
+        self::assertTaskCreatedContainsDataFromRequest($updatedTask, $requestBody);
+    }
+
+    private function loadTask(): Task
+    {
+        return $this->loadFixture(TaskFixture::class, Task::class);
+    }
+
     private static function assertTaskCreatedContainsDataFromRequest(Task $task, array $requestBody): void
     {
         self::assertSame($requestBody['title'], $task->getTitle());

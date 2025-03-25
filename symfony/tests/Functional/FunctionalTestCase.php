@@ -34,7 +34,7 @@ abstract class FunctionalTestCase extends KernelTestCase
      * @param class-string<T> $expectedEntityClass The expected entity class to be returned
      * @return T The entity created by the fixture
      */
-    protected function loadFixture(string $fixtureClass, string $expectedEntityClass): object
+    protected function loadFixture(string $fixtureClass, string $expectedEntityClass)
     {
         /** @var AbstractFixture $fixture */
         $fixture = new $fixtureClass();
@@ -83,7 +83,7 @@ abstract class FunctionalTestCase extends KernelTestCase
      *
      * @return T
      */
-    protected static function getService(string $className): object
+    protected static function getService(string $className)
     {
         return self::getContainer()->get($className);
     }
