@@ -125,7 +125,7 @@
                   <span class="font-medium">Tags</span>
                 </div>
                 <Chips
-                  v-model="editedTask.tags"
+                  v-model="editedTaskTagNames"
                   separator=","
                   placeholder="Add tag and press enter"
                   class="w-full"
@@ -225,8 +225,8 @@
             <div class="flex flex-wrap gap-2 p-2">
               <Tag
                 v-for="tag in task.tags"
-                :key="tag"
-                :value="tag"
+                :key="tag.name"
+                :value="tag.name"
                 severity="secondary"
               />
             </div>
@@ -535,6 +535,17 @@ const getPrioritySeverity = (priority: TaskPriority): string => {
   };
   return severities[priority] || 'secondary';
 };
+
+const editedTaskTagNames = computed({
+  get: () => {
+    return editedTask.value.tags?.map(tag =>
+        typeof tag === 'string' ? tag : tag.name
+    ) || [];
+  },
+  set: (newTags) => {
+    editedTask.value.tags = newTags;
+  }
+});
 </script>
 
 <style scoped>

@@ -146,6 +146,7 @@ export class TaskApiClient {
     const updatedTask = {
       ...this.tasks[taskIndex],
       ...taskData,
+      tags: taskData.tags?.map(tag => typeof tag === 'string' ? tag : tag.name),
       updatedAt: new Date().toISOString()
     };
     
