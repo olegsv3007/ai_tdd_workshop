@@ -5,6 +5,7 @@ namespace App\Tests\Acceptance;
 use App\Application\Bus\QueryBusContract;
 use App\Tests\Fixture\AbstractFixture;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -12,30 +13,33 @@ abstract class AcceptanceTestCase extends WebTestCase
 {
     protected ?EntityManagerInterface $entityManager = null;
     protected ?ContainerInterface $container = null;
-    private static $initialized = false;
+    protected KernelBrowser $client;
+
+    private static $initializedClasses = [];
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
+        // Get current class name for tracking initialization
+        $className = static::class;
+
         // Initialize once per test class
-        if (!self::$initialized) {
-            self::$initialized = true;
-            
+        if (!isset(self::$initializedClasses[$className])) {
+            self::$initializedClasses[$className] = true;
+
             // Initialize client and get container
             self::ensureKernelShutdown(); // Make sure kernel is shut down before creating client
-            $client = static::createClient();
-            $this->container = static::getContainer();
-            $this->entityManager = $this->container->get('doctrine.orm.entity_manager');
-            
-            // Start a transaction for test isolation
-            if (!$this->entityManager->getConnection()->isTransactionActive()) {
-                $this->entityManager->beginTransaction();
-            }
-        } else {
-            // Reuse existing container and entity manager
-            $this->container = static::getContainer();
-            $this->entityManager = $this->container->get('doctrine.orm.entity_manager');
+        }
+
+        // Always create a client for each test
+        $this->client = static::createClient();
+        $this->container = static::getContainer();
+        $this->entityManager = $this->container->get('doctrine.orm.entity_manager');
+
+        // Start a transaction for test isolation
+        if (!$this->entityManager->getConnection()->isTransactionActive()) {
+            $this->entityManager->beginTransaction();
         }
     }
     
@@ -64,9 +68,18 @@ abstract class AcceptanceTestCase extends WebTestCase
         
         return $entity;
     }
-    
 
-
+    /**
+     * @template T
+     *
+     * @param class-string<T> $className
+     *
+     * @return T
+     */
+    protected static function getService(string $className): object
+    {
+        return self::getContainer()->get($className);
+    }
     
     protected function tearDown(): void
     {
@@ -80,5 +93,7 @@ abstract class AcceptanceTestCase extends WebTestCase
         $this->entityManager->close();
         $this->entityManager = null;
         $this->container = null;
+
+        self::ensureKernelShutdown();
     }
 }
