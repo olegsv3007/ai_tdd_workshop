@@ -127,4 +127,20 @@ class TaskControllerTest extends AcceptanceTestCase
             self::assertContains($tag, $existingTags);
         }
     }
+
+    public function testDeleteTask(): void
+    {
+        $existingTaskId = $this->loadTask()->getId();
+
+        $this->client->request(
+            'DELETE',
+            sprintf('/api/tasks/%d', $existingTaskId),
+        );
+
+        $deletedTask = $this->taskRepository->findById($existingTaskId);
+
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('Content-Type', 'application/json');
+        self::assertNull($deletedTask);
+    }
 }
