@@ -19,10 +19,17 @@ docker-compose up -d
 
 That's it! Both Symfony and Vue.js will be automatically installed on the first run.
 
-2. To rebuild the containers after making changes to Dockerfiles:
+2. Run migrations:
 
 ```bash
-docker-compose up -d --build
+docker compose exec php php bin/console doctrine:migrations:migrate --no-interaction
+```
+
+3. Create test database
+
+```bash
+docker compose exec php php bin/console doctrine:database:create --env=test --if-not-exists
+docker compose exec php php bin/console doctrine:migrations:migrate --env=test
 ```
 
 ## Accessing the Applications
