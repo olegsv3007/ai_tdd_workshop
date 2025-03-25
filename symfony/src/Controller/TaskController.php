@@ -5,7 +5,9 @@ namespace App\Controller;
 use App\Application\Bus\CommandBusContract;
 use App\Application\Bus\QueryBusContract;
 use App\Application\Command\CreateTaskCommand;
+use App\Application\Command\UpdateTaskCommand;
 use App\Application\Query\GetAllTasksQuery;
+use App\Domain\Entity\Task;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,5 +38,18 @@ class TaskController extends AbstractController
         $commandBus->dispatch($command);
 
         return new JsonResponse([], Response::HTTP_CREATED);
+    }
+
+    #[Route('/api/tasks/{id}', name: 'task_update', methods: ['PUT'])]
+    public function updateTask(
+        Task $task,
+        #[MapRequestPayload] UpdateTaskCommand $command,
+        CommandBusContract $commandBus,
+    ): JsonResponse
+    {
+        $command->taskId = $task->getId();
+        $commandBus->dispatch($command);
+
+        return new JsonResponse([], Response::HTTP_OK);
     }
 }

@@ -211,4 +211,15 @@ class Task
 
         return $this;
     }
+
+    public function clearTags(): self
+    {
+        foreach ($this->tags->toArray() as $tag) {
+            $this->removeTag($tag);
+        }
+
+        $this->markAsUpdated();
+
+        return $this;
+    }
 }
