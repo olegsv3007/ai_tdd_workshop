@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Application\Bus\CommandBusContract;
 use App\Application\Bus\QueryBusContract;
 use App\Application\Command\CreateTaskCommand;
+use App\Application\Command\DeleteTaskCommand;
 use App\Application\Command\UpdateTaskCommand;
 use App\Application\Query\GetAllTasksQuery;
 use App\Domain\Entity\Task;
@@ -48,6 +49,20 @@ class TaskController extends AbstractController
     ): JsonResponse
     {
         $command->taskId = $task->getId();
+        $commandBus->dispatch($command);
+
+        return new JsonResponse([], Response::HTTP_OK);
+    }
+
+    #[Route('/api/tasks/{id}', name: 'task_delete', methods: ['DELETE'])]
+    public function deleteTask(
+        Task $task,
+        CommandBusContract $commandBus,
+    ): JsonResponse
+    {
+        $command = new DeleteTaskCommand();
+        $command->taskId = $task->getId();
+
         $commandBus->dispatch($command);
 
         return new JsonResponse([], Response::HTTP_OK);
