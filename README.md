@@ -11,26 +11,51 @@ This project sets up a complete development environment with:
 
 ## Getting Started
 
-1. Start the Docker environment:
+1. Clone the repository:
+
+```bash
+git clone git@github.com:olegsv3007/ai_tdd_workshop.git
+cd ai_tdd_workshop
+```
+
+2. Start the Docker environment:
 
 ```bash
 docker-compose up -d
 ```
 
-That's it! Both Symfony and Vue.js will be automatically installed on the first run.
+3. Install composer dependencies:
 
-2. Run migrations:
+```bash
+docker compose exec php composer install
+```
+
+4. Run migrations:
 
 ```bash
 docker compose exec php php bin/console doctrine:migrations:migrate --no-interaction
 ```
 
-3. Create test database
+5. Create test database
 
 ```bash
-docker compose exec php php bin/console doctrine:database:create --env=test --if-not-exists
-docker compose exec php php bin/console doctrine:migrations:migrate --env=test
+docker compose exec php php bin/console doctrine:database:create --env=test --if-not-exists --no-interaction
+docker compose exec php php bin/console doctrine:migrations:migrate --env=test --no-interaction
 ```
+
+6. Add llm instructions from .windsurfrules and llm_chat_instructions.md to pinned context to your AI agent.
+
+## Loading Test Data
+
+The application comes with task fixtures that can be loaded to quickly populate the database with test data.
+
+To load 20 test tasks with random properties and tags:
+
+```bash
+docker compose exec php php bin/console app:load-task-fixtures
+```
+
+This will clear any existing tasks and tags before creating new ones.
 
 ## Accessing the Applications
 
@@ -44,18 +69,6 @@ docker compose exec php php bin/console doctrine:migrations:migrate --env=test
 - Database: symfony
 - Username: symfony
 - Password: symfony
-
-## Loading Test Data
-
-The application comes with task fixtures that can be loaded to quickly populate the database with test data.
-
-To load 20 test tasks with random properties and tags:
-
-```bash
-docker compose exec php php bin/console app:load-task-fixtures
-```
-
-This will clear any existing tasks and tags before creating new ones.
 
 ## Services
 
