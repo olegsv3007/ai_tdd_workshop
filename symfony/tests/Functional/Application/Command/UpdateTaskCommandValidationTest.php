@@ -113,7 +113,7 @@ class UpdateTaskCommandValidationTest extends ValidationTestCase
         self::assertFieldInvalid($errors, 'tags', 'Tags must be array');
     }
 
-    public function assertTaskMustExist(): void
+    public function testTaskMustExist(): void
     {
         $command = new UpdateTaskCommand();
         $command->taskId = -1;
