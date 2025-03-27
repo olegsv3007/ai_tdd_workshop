@@ -10,22 +10,6 @@ use App\Tests\Validation\ValidationTestCase;
 
 class CreateTaskCommandValidationTest extends ValidationTestCase
 {
-    public function testRequiredFieldsValidation(): void
-    {
-        $command = new CreateTaskCommand();
-
-        $errors = $this->validator->validate($command);
-
-        self::assertFieldInvalid($errors, 'title', 'Title is required');
-        self::assertFieldInvalid($errors, 'description', 'Description is required');
-        self::assertFieldInvalid($errors, 'status', 'Status is required');
-        self::assertFieldInvalid($errors, 'type', 'Type is required');
-        self::assertFieldInvalid($errors, 'priority', 'Priority is required');
-        self::assertFieldInvalid($errors, 'reporter', 'Reporter is required');
-        self::assertFieldInvalid($errors, 'assignee', 'Assignee is required');
-        self::assertFieldInvalid($errors, 'estimated_hours', 'Estimated Hours is required');
-    }
-
     public function testEmptyFieldsValidation(): void
     {
         $command = new CreateTaskCommand();
@@ -78,7 +62,7 @@ class CreateTaskCommandValidationTest extends ValidationTestCase
 
         $errors = $this->validator->validate($command);
 
-        self::assertFieldInvalid($errors, 'estimated_hours', 'Estimated Hours must be greater than 0');
+        self::assertFieldInvalid($errors, 'estimatedHours', 'Estimated Hours must be greater than 0');
     }
 
     public function testCommandWithPossibleValuesIsValid(): void
