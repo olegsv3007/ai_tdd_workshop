@@ -61,6 +61,7 @@ class TaskControllerTest extends AcceptanceTestCase
 
         self::assertResponseIsSuccessful();
         self::assertResponseHeaderSame('Content-Type', 'application/json');
+        self::assertEmpty(json_decode($this->client->getResponse()->getContent(), true));
         self::assertTaskCreatedContainsDataFromRequest($createdTask, $requestBody);
     }
 
@@ -93,6 +94,7 @@ class TaskControllerTest extends AcceptanceTestCase
 
         self::assertResponseIsSuccessful();
         self::assertResponseHeaderSame('Content-Type', 'application/json');
+        self::assertEmpty(json_decode($this->client->getResponse()->getContent(), true));
         self::assertTaskCreatedContainsDataFromRequest($updatedTask, $requestBody);
     }
 
